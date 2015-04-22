@@ -247,8 +247,6 @@ func makeImg(b string, h int, qx int, qy int, u int) *image.NRGBA {
 	for k, v = range b {
 		if v == 49 {
 			drawRect(canvas, image.Rect(qx+k*u, qy, qx+k*u+u, qy+h), color.RGBA{0, 0, 0, 255})
-		} else {
-			drawRect(canvas, image.Rect(qx+k*u, qy, qx+k*u+u, qy+h), color.RGBA{255, 255, 255, 255})
 		}
 	}
 

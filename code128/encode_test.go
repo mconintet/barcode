@@ -4,6 +4,7 @@ import (
 	"image/png"
 	"os"
 	"testing"
+	"log"
 )
 
 func TestEncode(t *testing.T) {
@@ -13,10 +14,11 @@ func TestEncode(t *testing.T) {
 	// HI345678HI
 	// HI3456HI
 	// HI3456789HI
+	log.Println(encode([]byte("HI3456789HI")))
 }
 
 func TestNewPng(t *testing.T) {
-	ts := "HI3456HI"
+	ts := "HI3456789HI"
 
 	img, err := Encode([]byte(ts), 0, 0, 0, 2)
 
