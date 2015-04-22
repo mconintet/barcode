@@ -139,11 +139,9 @@ func encode(in []byte) (string, error) {
 					scv = StartCodeCValue
 					cct = CodeC
 				} else if ((bl >= 3 && bl+idx == inLen-1) || (bl == 5)) && isAllNum(nb) {
-					if cct != CodeC {
-						ret += CodeC
-						cct = CodeC
-						ws = append(ws, CodeCValue)
-					}
+					ret += CodeC
+					cct = CodeC
+					ws = append(ws, CodeCValue)
 				}
 
 				if cct == CodeC {
