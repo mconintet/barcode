@@ -26,7 +26,7 @@ func TestNewPng(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if file, err := os.OpenFile(ts+".png", os.O_RDWR|os.O_CREATE, 0666); err != nil {
+	if file, err := os.OpenFile("../test/"+ts+".png", os.O_RDWR|os.O_CREATE, 0666); err != nil {
 		t.Fatal(err)
 	} else {
 		png.Encode(file, img)
