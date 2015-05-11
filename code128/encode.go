@@ -63,7 +63,7 @@ func toCodeC(in []byte) (string, []int) {
 	l := len(in)
 
 	for i := 0; i < l; i += 2 {
-		t = string(in[i]) + string(in[i+1])
+		t = string(in[i])+string(in[i + 1])
 		en += MapEncodeCPattern[t]
 		ws = append(ws, MapEncodeCodeCValue[t])
 
@@ -117,7 +117,7 @@ func encode(in []byte) (string, error) {
 		}
 
 		if b < 32 || b > 127 {
-			return "", errors.New("unsupported character: " + string(b))
+			return "", errors.New("unsupported character: "+string(b))
 		}
 
 		if isNum(b) {
@@ -161,7 +161,7 @@ func encode(in []byte) (string, error) {
 			} else if cct == CodeC {
 				if nb, err = br.Peek(1); err == nil {
 					if isNum(nb[0]) {
-						tmp = string(b) + string(nb)
+						tmp = string(b)+string(nb)
 						ret += MapEncodeCPattern[tmp]
 						ws = append(ws, MapEncodeCodeCValue[tmp])
 
@@ -176,7 +176,7 @@ func encode(in []byte) (string, error) {
 		tmp = string(b)
 		codeType, code, startCode, startCodeValue, codeTypeValue, val = locate(tmp)
 		if val == -1 {
-			return "", errors.New("unsupport string: " + tmp)
+			return "", errors.New("unsupport string: "+tmp)
 		}
 
 		if codeType != cct {
@@ -198,11 +198,11 @@ func encode(in []byte) (string, error) {
 
 	checksum += scv
 	for k, v = range ws {
-		checksum += v * (k + 1)
+		checksum += v*(k+1)
 	}
 
-	checksum = checksum % 103
-	ret += MapEncodeChecksumPattern[checksum] + Stop
+	checksum = checksum%103
+	ret += MapEncodeChecksumPattern[checksum]+Stop
 
 	return ret, nil
 }
@@ -213,6 +213,26 @@ func drawRect(img *image.NRGBA, r image.Rectangle, c color.Color) {
 			img.Set(i, j, c)
 		}
 	}
+}
+
+func expandStr(str string) string {
+	var (
+		out []rune
+		runs []rune = []rune(str)
+	)
+
+	i := 0
+	l := len(runs)
+
+	for ; i < l; i++ {
+		out = append(out, runs[i])
+
+		if i%4 == 0 && i != 0 && i != l-1{
+			out = append(out, []rune("-")...)
+		}
+	}
+
+	return string(out)
 }
 
 func makeImg(s string, b string, h int, qx int, qy int, u int) (*image.NRGBA, error) {
@@ -240,8 +260,8 @@ func makeImg(s string, b string, h int, qx int, qy int, u int) (*image.NRGBA, er
 		h = 100
 	}
 
-	width = qx*2 + len(b)*u
-	height = qy*2 + h
+	width = qx*2+len(b)*u
+	height = qy*2+h
 
 	fontSize := 16
 
@@ -272,6 +292,8 @@ func makeImg(s string, b string, h int, qx int, qy int, u int) (*image.NRGBA, er
 	c.SetSrc(image.Black)
 	c.SetFont(font)
 	c.SetFontSize(float64(fontSize))
+
+	s = expandStr(s)
 
 	p, _ := c.DrawString(s, freetype.Pt(0, height+fontSize+5))
 	drawRect(canvas, image.Rect(0, height, width, height+fontSize+5), color.RGBA{255, 255, 255, 255})
