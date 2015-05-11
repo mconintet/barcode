@@ -18,7 +18,7 @@ func TestEncode(t *testing.T) {
 }
 
 func TestNewPng(t *testing.T) {
-	ts := "HI3456789HI"
+	ts := "test"
 
 	img, err := Encode([]byte(ts), 0, 0, 0, 2)
 

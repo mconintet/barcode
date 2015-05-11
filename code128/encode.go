@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
+	"github.com/mconintet/freetype-go/freetype"
 	"image"
 	"image/color"
 	"io"
+	"io/ioutil"
 )
 
 func locate(in string) (codeType string, code string, startCode string, startCodeValue int, codeTypeValue int, val int) {
@@ -213,7 +215,7 @@ func drawRect(img *image.NRGBA, r image.Rectangle, c color.Color) {
 	}
 }
 
-func makeImg(b string, h int, qx int, qy int, u int) *image.NRGBA {
+func makeImg(s string, b string, h int, qx int, qy int, u int) (*image.NRGBA, error) {
 	var (
 		width  int
 		height int
@@ -240,9 +242,12 @@ func makeImg(b string, h int, qx int, qy int, u int) *image.NRGBA {
 
 	width = qx*2 + len(b)*u
 	height = qy*2 + h
-	canvas = image.NewNRGBA(image.Rect(0, 0, width, height))
 
-	drawRect(canvas, image.Rect(0, 0, width, height), color.RGBA{255, 255, 255, 255})
+	fontSize := 16
+
+	canvas = image.NewNRGBA(image.Rect(0, 0, width, height+fontSize+5))
+
+	drawRect(canvas, image.Rect(0, 0, width, height+fontSize+5), color.RGBA{255, 255, 255, 255})
 
 	for k, v = range b {
 		if v == 49 {
@@ -250,7 +255,30 @@ func makeImg(b string, h int, qx int, qy int, u int) *image.NRGBA {
 		}
 	}
 
-	return canvas
+	data, err := ioutil.ReadFile("./fonts/luxisr.ttf")
+
+	if err != nil {
+		return nil, err
+	}
+
+	font, err := freetype.ParseFont(data)
+	if err != nil {
+		return nil, err
+	}
+
+	c := freetype.NewContext()
+	c.SetDst(canvas)
+	c.SetClip(canvas.Bounds())
+	c.SetSrc(image.Black)
+	c.SetFont(font)
+	c.SetFontSize(float64(fontSize))
+
+	p, _ := c.DrawString(s, freetype.Pt(0, height+fontSize+5))
+	drawRect(canvas, image.Rect(0, height, width, height+fontSize+5), color.RGBA{255, 255, 255, 255})
+
+	p, _ = c.DrawString(s, freetype.Pt(width/2-int(p.X)/256/2, height+fontSize))
+
+	return canvas, nil
 }
 
 func Encode(in []byte, h int, qx int, qy int, u int) (*image.NRGBA, error) {
@@ -263,5 +291,5 @@ func Encode(in []byte, h int, qx int, qy int, u int) (*image.NRGBA, error) {
 		return nil, err
 	}
 
-	return makeImg(bc, h, qx, qy, u), nil
+	return makeImg(string(in), bc, h, qx, qy, u)
 }
